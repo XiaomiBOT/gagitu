@@ -4,9 +4,9 @@ set -e
 
 TIMESTAMP=$(date -u +"%Y-%m-%d-%H-%M-%S")
 
-BRAND_NAME="${BRAND_NAME:-Jhonaley Tech}"
-BRAND_TEXT="${BRAND_TEXT:-Protect By Jhonaley}"
-CONTACT_TELEGRAM="${CONTACT_TELEGRAM:-@danangvalentp}"
+BRAND_NAME="${BRAND_NAME:-HanzX Tech}"
+BRAND_TEXT="${BRAND_TEXT:-Protect By HanzX}"
+CONTACT_TELEGRAM="${CONTACT_TELEGRAM:-@hanz_dev_sc}"
 BOT_LINK="${BOT_LINK:-@upgradeuser_bot}"
 WELCOME_TITLE="${WELCOME_TITLE:-Welcome To Server $BRAND_NAME}"
 WELCOME_MESSAGE="${WELCOME_MESSAGE:-Butuh panel legal yang anti mokad? langsung aja ke $BOT_LINK. Jika ada kendala dan ada yang ingin di tanyakan hubungi $CONTACT_TELEGRAM.}"
@@ -235,7 +235,7 @@ while i < len(lines):
             new_lines.append(lines[j])
             new_lines.append("        // PROTEKSI_JHONALEY: Hanya admin ID 1")
             new_lines.append("        if (!Auth::user() || (int) Auth::user()->id !== 1) {")
-            new_lines.append("            abort(403, 'Akses ditolak - protect by Jhonaley Tech');")
+            new_lines.append("            abort(403, 'Akses ditolak - protect by HanzX Tech');")
             new_lines.append("        }")
             i = j
 
@@ -293,7 +293,7 @@ while i < len(lines):
             new_lines.append(lines[j])
             new_lines.append("        // PROTEKSI_JHONALEY: Hanya admin ID 1")
             new_lines.append("        if (!Auth::user() || (int) Auth::user()->id !== 1) {")
-            new_lines.append("            abort(403, 'Akses ditolak - protect by Jhonaley Tech');")
+            new_lines.append("            abort(403, 'Akses ditolak - protect by HanzX Tech');")
             new_lines.append("        }")
             i = j
 
