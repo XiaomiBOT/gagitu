@@ -227,7 +227,6 @@ while i < len(lines):
 
     if re.search(r'public function (?!__construct)', line):
         j = i + 1
-        # FIX: Cari opening brace dengan proper bounds checking
         while j < len(lines) and '{' not in lines[j]:
             j += 1
         
@@ -252,7 +251,7 @@ echo "📋 Verifikasi NestController (cari PROTEKSI):"
 grep -n "PROTEKSI_JHONALEY" "$CONTROLLER" || echo "⚠️ Marker tidak ditemukan"
 echo ""
 
-# === LANGKAH 3: Proteksi juga EggController (halaman egg di dalam nest) ===
+# === LANGKAH 3: Proteksi juga EggController ===
 EGG_CONTROLLER="/var/www/pterodactyl/app/Http/Controllers/Admin/Nests/EggController.php"
 if [ -f "$EGG_CONTROLLER" ]; then
   if ! grep -q "PROTEKSI_JHONALEY" "$EGG_CONTROLLER"; then
@@ -285,7 +284,6 @@ while i < len(lines):
 
     if re.search(r'public function (?!__construct)', line):
         j = i + 1
-        # FIX: Proper bounds checking
         while j < len(lines) and '{' not in lines[j]:
             j += 1
         
@@ -373,7 +371,6 @@ while i < len(lines):
             li_start -= 1
 
         if li_start >= 0:
-            # FIX: Proper insert order
             new_lines.insert(li_start, "@if((int) Auth::user()->id === 1)")
             new_lines.insert(li_start, "{{-- PROTEKSI_NESTS_SIDEBAR --}}")
 
@@ -411,7 +408,6 @@ else
   echo "⚠️ File sidebar tidak ditemukan."
 fi
 
-# === LANGKAH 5: Cache clear di-handle oleh controller ===
 echo "ℹ️ Cache clear akan dilakukan oleh Protect Manager controller setelah install selesai"
 
 echo ""
@@ -443,7 +439,6 @@ LAYOUT_FILES=(
   "/var/www/pterodactyl/resources/views/layouts/app.blade.php"
 )
 
-# Cleanup branding lama dari master.blade.php dan auth.blade.php jika ada
 for CLEANUP_FILE in "/var/www/pterodactyl/resources/views/layouts/master.blade.php" "/var/www/pterodactyl/resources/views/layouts/auth.blade.php"; do
   if [ -f "$CLEANUP_FILE" ] && grep -q "BRANDING_JHONALEY" "$CLEANUP_FILE" 2>/dev/null; then
     cleanup_old_branding "$CLEANUP_FILE"
@@ -575,7 +570,7 @@ inject_branding() {
     <span class="jt-text">Panel by <a href="https://t.me/TELEGRAM_USERNAME_PLACEHOLDER" target="_blank">BRAND_NAME_HTML_PLACEHOLDER</a></span>
     <span class="jt-separator">●</span>
     <a class="jt-tg" href="https://t.me/TELEGRAM_USERNAME_PLACEHOLDER" target="_blank">
-      <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.309.036.309 0 0 .004.097 0 .252-.018 1.578-.115 5.19-.572 6.591-.4 1.092-.944 1.303-1.554 1.227-.79-.065-1.36-.39-2.117-.782l-.052.052-.648.627c-.469.453-.944.922-.497 1.427.32.39.758.485 1.225.356 1.244-.37 2.459-1.396 3.244-2.814.518-.997.978-2.663 1.064-4.266l.007-.734c.024-.566.027-.893.027-1.08v-.623c-.001-.566-.26-1.144-.656-1.511z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.[...]
       CONTACT_TELEGRAM_HTML_PLACEHOLDER
     </a>
     <span class="jt-separator">●</span>
@@ -585,13 +580,13 @@ inject_branding() {
 <!-- BRANDING_JHONALEY_END -->
 BRANDHTML
 
-  # FIX: Replace placeholders dengan variable values
-  sed -i "s/BRAND_TEXT_HTML_PLACEHOLDER/$BRAND_TEXT_HTML/g" "$BRANDING_TMP"
-  sed -i "s/BRAND_NAME_HTML_PLACEHOLDER/$BRAND_NAME_HTML/g" "$BRANDING_TMP"
-  sed -i "s/TELEGRAM_USERNAME_PLACEHOLDER/$TELEGRAM_USERNAME/g" "$BRANDING_TMP"
-  sed -i "s/CONTACT_TELEGRAM_HTML_PLACEHOLDER/$CONTACT_TELEGRAM_HTML/g" "$BRANDING_TMP"
-  sed -i "s/BOT_USERNAME_PLACEHOLDER/$BOT_USERNAME/g" "$BRANDING_TMP"
-  sed -i "s/BOT_LINK_HTML_PLACEHOLDER/$BOT_LINK_HTML/g" "$BRANDING_TMP"
+  # FIXED: Replace placeholders menggunakan pipe (|) sebagai separator, bukan slash (/)
+  sed -i "s|BRAND_TEXT_HTML_PLACEHOLDER|$BRAND_TEXT_HTML|g" "$BRANDING_TMP"
+  sed -i "s|BRAND_NAME_HTML_PLACEHOLDER|$BRAND_NAME_HTML|g" "$BRANDING_TMP"
+  sed -i "s|TELEGRAM_USERNAME_PLACEHOLDER|$TELEGRAM_USERNAME|g" "$BRANDING_TMP"
+  sed -i "s|CONTACT_TELEGRAM_HTML_PLACEHOLDER|$CONTACT_TELEGRAM_HTML|g" "$BRANDING_TMP"
+  sed -i "s|BOT_USERNAME_PLACEHOLDER|$BOT_USERNAME|g" "$BRANDING_TMP"
+  sed -i "s|BOT_LINK_HTML_PLACEHOLDER|$BOT_LINK_HTML|g" "$BRANDING_TMP"
 
   inject_before_closing "$FILE" "$BRANDING_TMP" "$LABEL"
   rm -f "$BRANDING_TMP"
@@ -608,7 +603,6 @@ for LF in "${LAYOUT_FILES[@]}"; do
   fi
 done
 
-# FIX: Warning instead of exit
 if [ "$BRANDING_APPLIED" -eq 0 ]; then
   echo "⚠️ Branding admin gagal dipasang: layout admin tidak ditemukan atau tidak termodifikasi"
 else
@@ -726,9 +720,9 @@ document.addEventListener("DOMContentLoaded", function() {
 <!-- /WELCOME_JHONALEY -->
 WELCOME_EOF
 
-  # FIX: Replace placeholders
-  sed -i "s/WELCOME_TITLE_JS_PLACEHOLDER/$WELCOME_TITLE_JS/g" "$WELCOME_TEMP"
-  sed -i "s/WELCOME_MESSAGE_JS_PLACEHOLDER/$WELCOME_MESSAGE_JS/g" "$WELCOME_TEMP"
+  # FIXED: Replace placeholders menggunakan pipe (|) sebagai separator
+  sed -i "s|WELCOME_TITLE_JS_PLACEHOLDER|$WELCOME_TITLE_JS|g" "$WELCOME_TEMP"
+  sed -i "s|WELCOME_MESSAGE_JS_PLACEHOLDER|$WELCOME_MESSAGE_JS|g" "$WELCOME_TEMP"
 
   inject_before_closing "$WELCOME_TARGET" "$WELCOME_TEMP" "$(basename "$WELCOME_TARGET")"
   rm -f "$WELCOME_TEMP"
@@ -736,7 +730,7 @@ WELCOME_EOF
 fi
 
 # ===================================================================
-# RE-INJECT SIDEBAR PROTECT MANAGER (jika hilang setelah modifikasi admin.blade.php)
+# RE-INJECT SIDEBAR PROTECT MANAGER
 # ===================================================================
 ADMIN_LAYOUT=""
 for CANDIDATE in \
@@ -801,9 +795,6 @@ SIDEBAR_PM_EOF
   rm -f "$SIDEBAR_SNIPPET"
 fi
 
-# ===================================================================
-# CLEAR CACHE - di-handle oleh controller
-# ===================================================================
 echo "ℹ️ Cache clear akan dilakukan oleh Protect Manager controller"
 
 echo ""
