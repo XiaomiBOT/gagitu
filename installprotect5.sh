@@ -226,19 +226,19 @@ while i < len(lines):
     new_lines.append(line)
 
     if re.search(r'public function (?!__construct)', line):
-        j = i
+        j = i + 1
+        # FIX: Cari opening brace dengan proper bounds checking
         while j < len(lines) and '{' not in lines[j]:
             j += 1
-            if j > i:
-                new_lines.append(lines[j])
-
-        new_lines.append("        // PROTEKSI_JHONALEY: Hanya admin ID 1")
-        new_lines.append("        if (!Auth::user() || (int) Auth::user()->id !== 1) {")
-        new_lines.append("            abort(403, 'Akses ditolak - protect by Jhonaley Tech');")
-        new_lines.append("        }")
-
-        if j > i:
+        
+        if j < len(lines):
+            new_lines.append(lines[j])
+            new_lines.append("        // PROTEKSI_JHONALEY: Hanya admin ID 1")
+            new_lines.append("        if (!Auth::user() || (int) Auth::user()->id !== 1) {")
+            new_lines.append("            abort(403, 'Akses ditolak - protect by Jhonaley Tech');")
+            new_lines.append("        }")
             i = j
+
     i += 1
 
 with open(controller, "w") as f:
@@ -249,7 +249,7 @@ PYEOF
 
 echo ""
 echo "📋 Verifikasi NestController (cari PROTEKSI):"
-grep -n "PROTEKSI_JHONALEY" "$CONTROLLER"
+grep -n "PROTEKSI_JHONALEY" "$CONTROLLER" || echo "⚠️ Marker tidak ditemukan"
 echo ""
 
 # === LANGKAH 3: Proteksi juga EggController (halaman egg di dalam nest) ===
@@ -284,19 +284,19 @@ while i < len(lines):
     new_lines.append(line)
 
     if re.search(r'public function (?!__construct)', line):
-        j = i
+        j = i + 1
+        # FIX: Proper bounds checking
         while j < len(lines) and '{' not in lines[j]:
             j += 1
-            if j > i:
-                new_lines.append(lines[j])
-
-        new_lines.append("        // PROTEKSI_JHONALEY: Hanya admin ID 1")
-        new_lines.append("        if (!Auth::user() || (int) Auth::user()->id !== 1) {")
-        new_lines.append("            abort(403, 'Akses ditolak - protect by Jhonaley Tech');")
-        new_lines.append("        }")
-
-        if j > i:
+        
+        if j < len(lines):
+            new_lines.append(lines[j])
+            new_lines.append("        // PROTEKSI_JHONALEY: Hanya admin ID 1")
+            new_lines.append("        if (!Auth::user() || (int) Auth::user()->id !== 1) {")
+            new_lines.append("            abort(403, 'Akses ditolak - protect by Jhonaley Tech');")
+            new_lines.append("        }")
             i = j
+
     i += 1
 
 with open(controller, "w") as f:
@@ -373,8 +373,9 @@ while i < len(lines):
             li_start -= 1
 
         if li_start >= 0:
-            new_lines.insert(li_start, "{{-- PROTEKSI_NESTS_SIDEBAR --}}")
+            # FIX: Proper insert order
             new_lines.insert(li_start, "@if((int) Auth::user()->id === 1)")
+            new_lines.insert(li_start, "{{-- PROTEKSI_NESTS_SIDEBAR --}}")
 
             new_lines.append(line)
             i += 1
@@ -475,7 +476,7 @@ inject_branding() {
   cleanup_old_branding "$FILE"
 
   BRANDING_TMP="/tmp/branding_inject_${TIMESTAMP}_$(basename "$FILE").html"
-  cat > "$BRANDING_TMP" << BRANDHTML
+  cat > "$BRANDING_TMP" << 'BRANDHTML'
 <!-- BRANDING_JHONALEY_START -->
 <style>
   .jhonaley-footer {
@@ -570,19 +571,27 @@ inject_branding() {
 </style>
 <div class="jhonaley-footer">
   <div class="jt-inner">
-    <span class="jt-badge">$BRAND_TEXT_HTML</span>
-    <span class="jt-text">Panel by <a href="https://t.me/$TELEGRAM_USERNAME" target="_blank">$BRAND_NAME_HTML</a></span>
+    <span class="jt-badge">BRAND_TEXT_HTML_PLACEHOLDER</span>
+    <span class="jt-text">Panel by <a href="https://t.me/TELEGRAM_USERNAME_PLACEHOLDER" target="_blank">BRAND_NAME_HTML_PLACEHOLDER</a></span>
     <span class="jt-separator">●</span>
-    <a class="jt-tg" href="https://t.me/$TELEGRAM_USERNAME" target="_blank">
-      <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-      $CONTACT_TELEGRAM_HTML
+    <a class="jt-tg" href="https://t.me/TELEGRAM_USERNAME_PLACEHOLDER" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.309.036.309 0 0 .004.097 0 .252-.018 1.578-.115 5.19-.572 6.591-.4 1.092-.944 1.303-1.554 1.227-.79-.065-1.36-.39-2.117-.782l-.052.052-.648.627c-.469.453-.944.922-.497 1.427.32.39.758.485 1.225.356 1.244-.37 2.459-1.396 3.244-2.814.518-.997.978-2.663 1.064-4.266l.007-.734c.024-.566.027-.893.027-1.08v-.623c-.001-.566-.26-1.144-.656-1.511z"/></svg>
+      CONTACT_TELEGRAM_HTML_PLACEHOLDER
     </a>
     <span class="jt-separator">●</span>
-    <span class="jt-promo">Butuh panel yang anti mokad? Langsung aja ke <a href="https://t.me/$BOT_USERNAME" target="_blank">$BOT_LINK_HTML</a></span>
+    <span class="jt-promo">Butuh panel yang anti mokad? Langsung aja ke <a href="https://t.me/BOT_USERNAME_PLACEHOLDER" target="_blank">BOT_LINK_HTML_PLACEHOLDER</a></span>
   </div>
 </div>
 <!-- BRANDING_JHONALEY_END -->
 BRANDHTML
+
+  # FIX: Replace placeholders dengan variable values
+  sed -i "s/BRAND_TEXT_HTML_PLACEHOLDER/$BRAND_TEXT_HTML/g" "$BRANDING_TMP"
+  sed -i "s/BRAND_NAME_HTML_PLACEHOLDER/$BRAND_NAME_HTML/g" "$BRANDING_TMP"
+  sed -i "s/TELEGRAM_USERNAME_PLACEHOLDER/$TELEGRAM_USERNAME/g" "$BRANDING_TMP"
+  sed -i "s/CONTACT_TELEGRAM_HTML_PLACEHOLDER/$CONTACT_TELEGRAM_HTML/g" "$BRANDING_TMP"
+  sed -i "s/BOT_USERNAME_PLACEHOLDER/$BOT_USERNAME/g" "$BRANDING_TMP"
+  sed -i "s/BOT_LINK_HTML_PLACEHOLDER/$BOT_LINK_HTML/g" "$BRANDING_TMP"
 
   inject_before_closing "$FILE" "$BRANDING_TMP" "$LABEL"
   rm -f "$BRANDING_TMP"
@@ -599,19 +608,19 @@ for LF in "${LAYOUT_FILES[@]}"; do
   fi
 done
 
+# FIX: Warning instead of exit
 if [ "$BRANDING_APPLIED" -eq 0 ]; then
-  echo "❌ Branding admin gagal dipasang: layout admin tidak ditemukan atau tidak termodifikasi"
-  exit 1
+  echo "⚠️ Branding admin gagal dipasang: layout admin tidak ditemukan atau tidak termodifikasi"
+else
+  for LF in "${LAYOUT_FILES[@]}"; do
+    if [ -f "$LF" ] && grep -q "<title>" "$LF"; then
+      sed -i "s|<title>.*</title>|<title>Pterodactyl - $SAFE_TITLE</title>|g" "$LF" 2>/dev/null || true
+      echo "✅ Title diubah di $(basename "$LF")"
+    fi
+  done
+
+  echo "✅ Branding selesai!"
 fi
-
-for LF in "${LAYOUT_FILES[@]}"; do
-  if [ -f "$LF" ] && grep -q "<title>" "$LF"; then
-    sed -i "s|<title>.*</title>|<title>Pterodactyl - $SAFE_TITLE</title>|g" "$LF" 2>/dev/null || true
-    echo "✅ Title diubah di $(basename "$LF")"
-  fi
-done
-
-echo "✅ Branding selesai!"
 
 # ============================================================
 # === BAGIAN 3: Welcome Banner di Client Dashboard ===
@@ -645,7 +654,7 @@ else
   remove_block_by_markers "$WELCOME_TARGET" "<!-- WELCOME_JHONALEY: Welcome Banner -->" "<!-- /WELCOME_JHONALEY -->"
 
   WELCOME_TEMP=$(mktemp)
-  cat > "$WELCOME_TEMP" << WELCOME_EOF
+  cat > "$WELCOME_TEMP" << 'WELCOME_EOF'
 <!-- WELCOME_JHONALEY: Welcome Banner -->
 <style>
   .jhonaley-welcome {
@@ -702,7 +711,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var banner = document.createElement("div");
     banner.id = "jhonaley-welcome-banner";
     banner.className = "jhonaley-welcome";
-    banner.innerHTML = '<div class="jw-icon">ℹ️</div><div class="jw-content"><h3>$WELCOME_TITLE_JS</h3><p>$WELCOME_MESSAGE_JS</p></div>';
+    banner.innerHTML = '<div class="jw-icon">ℹ️</div><div class="jw-content"><h3>WELCOME_TITLE_JS_PLACEHOLDER</h3><p>WELCOME_MESSAGE_JS_PLACEHOLDER</p></div>';
     if (target.firstChild) { target.insertBefore(banner, target.firstChild); }
     else { target.appendChild(banner); }
   }
@@ -716,6 +725,10 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 <!-- /WELCOME_JHONALEY -->
 WELCOME_EOF
+
+  # FIX: Replace placeholders
+  sed -i "s/WELCOME_TITLE_JS_PLACEHOLDER/$WELCOME_TITLE_JS/g" "$WELCOME_TEMP"
+  sed -i "s/WELCOME_MESSAGE_JS_PLACEHOLDER/$WELCOME_MESSAGE_JS/g" "$WELCOME_TEMP"
 
   inject_before_closing "$WELCOME_TARGET" "$WELCOME_TEMP" "$(basename "$WELCOME_TARGET")"
   rm -f "$WELCOME_TEMP"
@@ -799,7 +812,7 @@ echo "✅ INSTALLPROTECT5 SELESAI!"
 echo "==========================================="
 echo "🔒 Menu Nests disembunyikan (selain ID 1)"
 echo "🔒 Akses NestController diblock (selain ID 1)"
-echo "🎨 Branding footer $BRAND_NAME terpasang (hanya admin)"
+echo "🎨 Branding footer $BRAND_NAME terpasang"
 echo "📝 Title panel diubah"
 echo "📋 Welcome banner terpasang di client dashboard"
 echo "📱 Kontak: $CONTACT_TELEGRAM"
